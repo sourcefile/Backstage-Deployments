@@ -1,0 +1,47 @@
+name: rg-vnet
+on:
+  push:
+    paths:
+      - '*.tf'
+  workflow_dispatch:
+     inputs:
+      subscriptionId:
+        description: "Azure Subscription ID"
+        type: "string"
+      ResourceGroupName:
+        description: "Resource Group Name"
+        type: "string"
+      VirtualNetworkName:
+        description: "Virtual Network Name"
+        type: "string"
+      Location:
+        description: "Location"
+        type: "string"  
+      action:
+        description: "Action to perform like apply or destroy"
+        type: "string"   
+jobs:
+  resourcegroups:
+    runs-on: ubuntu-latest
+    name: 'rg-connectivity-001'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ github.event.inputs.subscriptionId }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    steps:
+      - uses: actions/checkout@main
+      - name: 'Terraform init'
+        id: init
+        run: |
+          terraform init          
+
+      - name: 'Terraform plan'
+        id: plan
+        run: |
+          terraform plan -var rg_name=${{ github.event.inputs.ResourceGroupName }} -var rg_location=${{ github.event.inputs.Location }} -var vnetname=${{ github.event.inputs.VirtualNetworkName }}
+
+      - name: 'Terraform apply'
+        id: apply
+        run: |
+          terraform ${{ github.event.inputs.action }} -var rg_name=${{ github.event.inputs.ResourceGroupName }} -var rg_location=${{ github.event.inputs.Location }} -var vnetname=${{ github.event.inputs.VirtualNetworkName }}
