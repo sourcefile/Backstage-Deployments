@@ -29,8 +29,12 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ github.event.inputs.subscriptionId }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    defaults:
+      run:
+        working-directory: ./rg-vnet
     steps:
       - uses: actions/checkout@main
+      - uses: hashicorp/setup-terraform@v3
       - name: 'Terraform init'
         id: init
         run: |
@@ -39,9 +43,9 @@ jobs:
       - name: 'Terraform plan'
         id: plan
         run: |
-          terraform plan -var rg_name=${{ github.event.inputs.ResourceGroupName }} -var rg_location=${{ github.event.inputs.Location }} -var vnetname=${{ github.event.inputs.VirtualNetworkName }}
+          terraform plan -var subscriptionid="${{ github.event.inputs.subscriptionId }}" -var rg_name="${{ github.event.inputs.ResourceGroupName }}" -var rg_location="${{ github.event.inputs.Location }}" -var vnetname="${{ github.event.inputs.VirtualNetworkName }}"
 
       - name: 'Terraform apply'
         id: apply
         run: |
-          terraform ${{ github.event.inputs.action }} -var rg_name=${{ github.event.inputs.ResourceGroupName }} -var rg_location=${{ github.event.inputs.Location }} -var vnetname=${{ github.event.inputs.VirtualNetworkName }}
+          terraform ${{ github.event.inputs.action }} -var subscriptionid="${{ github.event.inputs.subscriptionId }}" -var rg_name="${{ github.event.inputs.ResourceGroupName }}" -var rg_location="${{ github.event.inputs.Location }}" -var vnetname="${{ github.event.inputs.VirtualNetworkName }}" -auto-approve

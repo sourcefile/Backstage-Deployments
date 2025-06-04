@@ -26,8 +26,8 @@ resource "azurerm_resource_group" "resourcegroup" {
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = var.vnetName
-  location            = azurerm_resource_group.resourcegroup.rg_location
+  name                = var.vnetname
+  location            = azurerm_resource_group.resourcegroup.location
   resource_group_name = azurerm_resource_group.resourcegroup.name
   address_space       = ["10.0.0.0/16"]
   dns_servers         = ["10.0.0.4", "10.0.0.5"]
